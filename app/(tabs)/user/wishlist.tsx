@@ -1,59 +1,52 @@
 import React from 'react';
-import { View, Text, FlatList, Alert, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, FlatList, StyleSheet, StatusBar } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLibrary } from '../../context/LibraryContext';
-import { BorrowCard } from '../../components/BorrowCard';
+import { useLibrary } from '../../../context/LibraryContext';
+import { BookCard } from '../../../components/BookCard';
 
-export default function BorrowedScreen() {
-  const { borrowedBooks, returnBook } = useLibrary();
+export default function WishlistScreen() {
+  const router = useRouter();
+  const { books, removeFromWishlist, isInWishlist } = useLibrary();
   const insets = useSafeAreaInsets();
 
-  const handleReturn = (bookId: string, bookTitle: string) => {
-    Alert.alert(
-      'Konfirmasi Pengembalian',
-      `Apakah Anda yakin ingin mengembalikan "${bookTitle}"?`,
-      [
-        { text: 'Batal', style: 'cancel' },
-        {
-          text: 'Ya, Kembalikan',
-          onPress: () => {
-            returnBook(bookId);
-            Alert.alert('Berhasil', 'Buku berhasil dikembalikan');
-          },
-        },
-      ]
-    );
-  };
+  const wishlistBooks = books.filter(book => isInWishlist(book.id));
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       
       <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-        <Text style={styles.headerTitle}>Buku Dipinjam</Text>
-        <Text style={styles.headerSubtitle}>{borrowedBooks.length} buku aktif</Text>
+        <Text style={styles.headerTitle}>Buku Favorit</Text>
+        <Text style={styles.headerSubtitle}>{wishlistBooks.length} buku tersimpan</Text>
       </View>
 
       <FlatList
-        data={borrowedBooks}
+        data={wishlistBooks}
+        numColumns={2}
         contentContainerStyle={styles.listContainer}
+        columnWrapperStyle={wishlistBooks.length > 0 ? styles.row : undefined}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
-          <BorrowCard
-            book={item}
-            onReturn={() => handleReturn(item.id, item.title)}
-          />
+          <View style={styles.bookWrapper}>
+            <BookCard
+              book={item}
+              onPress={() => router.push(`/book/${item.id}`)}
+              onWishlistPress={() => removeFromWishlist(item.id)}
+              isInWishlist={true}
+            />
+          </View>
         )}
         keyExtractor={(item) => item.id}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <View style={styles.emptyIconContainer}>
-              <Ionicons name="bookmarks-outline" size={64} color="#2563EB" />
+              <Ionicons name="heart-outline" size={64} color="#2563EB" />
             </View>
-            <Text style={styles.emptyText}>Belum ada buku dipinjam</Text>
+            <Text style={styles.emptyText}>Belum ada buku favorit</Text>
             <Text style={styles.emptySubtext}>
-              Pinjam buku dari katalog untuk{'\n'}mulai membaca
+              Tekan ikon hati pada buku untuk{'\n'}menambahkan ke favorit
             </Text>
           </View>
         }
@@ -65,12 +58,11 @@ export default function BorrowedScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 24,
   },
   headerTitle: {
     fontSize: 28,
@@ -83,8 +75,15 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   listContainer: {
-    paddingTop: 16,
+    paddingHorizontal: 20,
     paddingBottom: 20,
+  },
+  row: {
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  bookWrapper: {
+    width: '48%',
   },
   emptyContainer: {
     alignItems: 'center',

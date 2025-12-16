@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, StyleSheet, StatusBar 
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../../context/AuthContext';
-import { useLibrary } from '../../context/LibraryContext';
+import { useAuth } from '../../../context/AuthContext';
+import { useLibrary } from '../../../context/LibraryContext';
 
 export default function ProfileScreen() {
   const router = useRouter();

@@ -40,14 +40,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Safely get users array from storage
+  const getUsers = async (): Promise<any[]> => {
+    try {
+      const usersJson = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
+      const parsed = usersJson ? JSON.parse(usersJson) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn('Users storage corrupted, resetting to []');
+      return [];
+    }
+  };
+
   const register = async (nipd: string, name: string, email: string, password: string): Promise<boolean> => {
     try {
-      // Get existing users
-      const usersJson = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
-      const users = usersJson ? JSON.parse(usersJson) : [];
+      // Normalize inputs
+      const normalizedNipd = String(nipd).trim();
+      const normalizedName = String(name).trim();
+      const normalizedEmail = String(email).trim().toLowerCase();
 
-      // Check if NIPD already exists
-      const existingUser = users.find((u: any) => u.nipd === nipd);
+      // Get existing users (with safe parsing)
+      const users = await getUsers();
+
+      // Check if NIPD already exists (normalize existing too to avoid whitespace issues)
+      const existingUser = users.find((u: any) => String(u?.nipd ?? '').trim() === normalizedNipd);
       if (existingUser) {
         return false; // NIPD already registered
       }
@@ -55,9 +71,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Create new user
       const newUser = {
         id: Date.now().toString(),
-        nipd,
-        name,
-        email,
+        nipd: normalizedNipd,
+        name: normalizedName,
+        email: normalizedEmail,
         password, // In production, hash this!
       };
 
@@ -79,12 +95,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (nipd: string, password: string): Promise<boolean> => {
     try {
-      // Get existing users
-      const usersJson = await AsyncStorage.getItem(STORAGE_KEYS.USERS);
-      const users = usersJson ? JSON.parse(usersJson) : [];
+      // Get existing users (with safe parsing)
+      const users = await getUsers();
+
+      // Normalize
+      const normalizedNipd = String(nipd).trim();
 
       // Find user with matching NIPD and password
-      const user = users.find((u: any) => u.nipd === nipd && u.password === password);
+      const user = users.find((u: any) => String(u?.nipd ?? '').trim() === normalizedNipd && u.password === password);
       
       if (!user) {
         return false; // Invalid credentials
@@ -104,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem(STORAGE_KEYS.CURRENT_USER);
+      await AsyncStorage.clear()
       setUser(null);
     } catch (error) {
       console.error('Error logging out:', error);

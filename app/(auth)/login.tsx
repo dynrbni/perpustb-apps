@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Animated, { useAnimatedKeyboard, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +12,27 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
+
+  // Keyboard-aware subtle animations for header and footer
+  const keyboard = useAnimatedKeyboard();
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const isOpen = keyboard.height.value > 0;
+    return {
+      transform: [
+        { translateY: withTiming(isOpen ? -20 : 0, { duration: 220 }) },
+        { scale: withTiming(isOpen ? 0.95 : 1, { duration: 220 }) },
+      ],
+      opacity: withTiming(isOpen ? 0.9 : 1, { duration: 220 }),
+      marginBottom: withTiming(isOpen ? 24 : 48, { duration: 220 }),
+    };
+  });
+  const footerAnimatedStyle = useAnimatedStyle(() => {
+    const isOpen = keyboard.height.value > 0;
+    return {
+      opacity: withTiming(isOpen ? 0 : 1, { duration: 180 }),
+      transform: [{ translateY: withTiming(isOpen ? 10 : 0, { duration: 180 }) }],
+    };
+  });
 
   const handleLogin = async () => {
     if (!nipd || !password) {
@@ -42,13 +64,13 @@ export default function LoginScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            <View style={styles.header}>
+            <Animated.View style={[styles.header, headerAnimatedStyle]}>
               <View style={styles.logoContainer}>
                 <Ionicons name="library" size={48} color="#2563EB" />
               </View>
               <Text style={styles.title}>Selamat Datang</Text>
               <Text style={styles.subtitle}>Masuk ke akun Anda untuk melanjutkan</Text>
-            </View>
+            </Animated.View>
 
             <View style={styles.form}>
               <View style={styles.inputGroup}>
@@ -103,12 +125,12 @@ export default function LoginScreen() {
                 )}
               </TouchableOpacity>
 
-              <View style={styles.footer}>
+              <Animated.View style={[styles.footer, footerAnimatedStyle]}>
                 <Text style={styles.footerText}>Belum punya akun? </Text>
                 <TouchableOpacity onPress={() => router.push('/(auth)/register')} disabled={isLoading}>
                   <Text style={styles.footerLink}>Daftar Sekarang</Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             </View>
           </View>
         </ScrollView>

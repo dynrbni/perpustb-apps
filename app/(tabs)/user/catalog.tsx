@@ -3,8 +3,8 @@ import { View, Text, FlatList, TouchableOpacity, TextInput, StyleSheet, StatusBa
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useLibrary } from '../../context/LibraryContext';
-import { BookCard } from '../../components/BookCard';
+import { useLibrary } from '../../../context/LibraryContext';
+import { BookCard } from '../../../components/BookCard';
 
 export default function CatalogScreen() {
   const router = useRouter();

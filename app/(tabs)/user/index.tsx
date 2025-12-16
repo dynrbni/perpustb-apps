@@ -3,9 +3,9 @@ import { View, Text, ScrollView, FlatList, TouchableOpacity, StyleSheet, StatusB
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth } from '../../context/AuthContext';
-import { useLibrary } from '../../context/LibraryContext';
-import { BookCard } from '../../components/BookCard';
+import { useAuth } from '../../../context/AuthContext';
+import { useLibrary } from '../../../context/LibraryContext';
+import { BookCard } from '../../../components/BookCard';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -44,7 +44,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity 
           style={styles.searchBar}
-          onPress={() => router.push('/(tabs)/catalog')}
+          onPress={() => router.push('/(tabs)/user/catalog')}
         >
           <Ionicons name="search-outline" size={20} color="#94A3B8" />
           <Text style={styles.searchText}>Cari judul buku atau penulis...</Text>
@@ -77,7 +77,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Buku Pilihan</Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/catalog')}>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/user/catalog')}>
               <Text style={styles.seeAllText}>Lihat Semua →</Text>
             </TouchableOpacity>
           </View>
@@ -108,7 +108,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Sedang Populer</Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/catalog')}>
+            <TouchableOpacity onPress={() => router.push('/(tabs)/user/catalog')}>
               <Text style={styles.seeAllText}>Lihat Semua →</Text>
             </TouchableOpacity>
           </View>
@@ -138,7 +138,7 @@ export default function HomeScreen() {
 
         <TouchableOpacity 
           style={styles.banner}
-          onPress={() => router.push('/(tabs)/catalog')}
+          onPress={() => router.push('/(tabs)/user/catalog')}
         >
           <View style={styles.bannerIcon}>
             <Ionicons name="star" size={28} color="#F59E0B" />

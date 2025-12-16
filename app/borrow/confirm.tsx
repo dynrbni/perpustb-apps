@@ -37,7 +37,7 @@ export default function BorrowConfirmScreen() {
       [
         {
           text: 'OK',
-          onPress: () => router.push('/(tabs)/borrowed'),
+          onPress: () => router.push('/(tabs)/user/borrowed'),
         },
       ]
     );

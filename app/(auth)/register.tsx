@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Animated, { useAnimatedKeyboard, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, StatusBar, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -14,6 +15,27 @@ export default function RegisterScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { register } = useAuth();
+
+  // Keyboard-aware subtle animations for header and footer
+  const keyboard = useAnimatedKeyboard();
+  const headerAnimatedStyle = useAnimatedStyle(() => {
+    const isOpen = keyboard.height.value > 0;
+    return {
+      transform: [
+        { translateY: withTiming(isOpen ? -16 : 0, { duration: 220 }) },
+        { scale: withTiming(isOpen ? 0.96 : 1, { duration: 220 }) },
+      ],
+      opacity: withTiming(isOpen ? 0.9 : 1, { duration: 220 }),
+      marginBottom: withTiming(isOpen ? 24 : 40, { duration: 220 }),
+    };
+  });
+  const footerAnimatedStyle = useAnimatedStyle(() => {
+    const isOpen = keyboard.height.value > 0;
+    return {
+      opacity: withTiming(isOpen ? 0 : 1, { duration: 180 }),
+      transform: [{ translateY: withTiming(isOpen ? 10 : 0, { duration: 180 }) }],
+    };
+  });
 
   const handleRegister = async () => {
     if (!nipd || !name || !email || !password || !confirmPassword) {
@@ -84,13 +106,13 @@ export default function RegisterScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            <View style={styles.header}>
+            <Animated.View style={[styles.header, headerAnimatedStyle]}>
               <View style={styles.logoContainer}>
                 <Ionicons name="library" size={48} color="#2563EB" />
               </View>
               <Text style={styles.title}>Daftar Akun</Text>
               <Text style={styles.subtitle}>Buat akun baru untuk memulai</Text>
-            </View>
+            </Animated.View>
 
             <View style={styles.form}>
               <View style={styles.inputGroup}>
@@ -192,12 +214,12 @@ export default function RegisterScreen() {
                 )}
               </TouchableOpacity>
 
-              <View style={styles.footer}>
+              <Animated.View style={[styles.footer, footerAnimatedStyle]}>
                 <Text style={styles.footerText}>Sudah punya akun? </Text>
                 <TouchableOpacity onPress={() => router.back()} disabled={isLoading}>
                   <Text style={styles.footerLink}>Masuk</Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             </View>
           </View>
         </ScrollView>
